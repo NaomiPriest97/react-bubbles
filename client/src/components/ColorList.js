@@ -13,7 +13,7 @@ const ColorList = ({ colors, updateColors }) => {
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
   
-  const { id } = useParams();
+  
   const { push } = useHistory();
 
   const editColor = color => {
@@ -23,6 +23,8 @@ const ColorList = ({ colors, updateColors }) => {
 
   const saveEdit = e => {
     e.preventDefault();
+    e.persist();
+    let value = e.target.value;
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
@@ -30,8 +32,13 @@ const ColorList = ({ colors, updateColors }) => {
     .put(`/api/colors/${e.id}`, colorToEdit)
     .then(res => {
       console.log(res.data, 'save')
-      setColorToEdit(res.data)
-      push(`/protected/`);
+      //setColorToEdit(res.data)
+      let value = e.target.value;
+      if(e.target.name === 'color') 
+      setColorToEdit({
+        ...colorToEdit,
+        [e.target.name]: e.target.value
+      })
     })
     .catch(err => console.log(err));
   };
