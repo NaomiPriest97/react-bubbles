@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-//import { useHistory } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useParams, useHistory } from 'react-router-dom';
 import { axiosWithAuth } from '../utils/axiosWithAuth';
 
 
@@ -9,10 +9,12 @@ const initialColor = {
 };
 
 const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+  console.log(colors, 'colors');
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
-  //const history = useHistory();
+  
+  const { id } = useParams();
+  const { push } = useHistory();
 
   const editColor = color => {
     setEditing(true);
@@ -24,19 +26,25 @@ const ColorList = ({ colors, updateColors }) => {
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
-    
-
+    axiosWithAuth()
+    .put(`/api/colors/${e.id}`, colorToEdit)
+    .then(res => {
+      console.log(res.data, 'save')
+      setColorToEdit(res.data)
+      push(`/protected/`);
+    })
+    .catch(err => console.log(err));
   };
 
   const deleteColor = color => {
     // make a delete request to delete this color
-    
     axiosWithAuth()
     .delete(`/api/colors/${color.id}`)
     .then(res => {
-      console.log(res, 'delete');
+      console.log(res.data, 'delete');
       updateColors(res.data);
-      // history.pushState('/protected');
+      push('/protected');
+       
     })
     .catch(err => console.log(err));
   };
@@ -89,7 +97,7 @@ const ColorList = ({ colors, updateColors }) => {
             />
           </label>
           <div className="button-row">
-            <button type="submit">save</button>
+            <button type="submit" onClick={() => {}}>save</button>
             <button onClick={() => setEditing(false)}>cancel</button>
           </div>
         </form>
